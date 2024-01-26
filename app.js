@@ -3,7 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const device = require("express-device");
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
@@ -15,20 +15,6 @@ app.use((req, res, next) => {
 });
 
 // Routes
-// app.use(device.capture());
-
-// app.use((req, res, next) => {
-//   const userAgent = req.get('User-Agent');
-//   const deviceType = req.device.type;
-//   const ipAddress = req.ip;
-
-//   console.log('User Agent:', userAgent);
-//   console.log('Device Type:', deviceType);
-//   console.log('IP Address:', ipAddress);
-
-//   next();
-// });
-
 app.get("/", (req, res) => {
   // Your response logic
   res.send("Hello World!");
