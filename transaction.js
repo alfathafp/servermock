@@ -1,5 +1,5 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+const express = require("express");
+const bodyParser = require("body-parser");
 const app = express();
 const port = 3000;
 
@@ -12,18 +12,51 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('v1/transaction', (req, res) => {
-    
-})
+// return res.status(errorCode).json({ error: errorMessage });
 
+app.get("/v1/transaction", (req, res) => {
+  const { transactionId, orderId, amount, transactionStatus } = req.body;
+  let transactionResponse = null;
 
-app.get('/payloadtest', (req, res) => {
-    const { name, age } = req.body;
-  
-    if (!name || !age) {
-      return res.status(400).json({ error: 'Name and age are required in the payload.' });
-    }
-  
-    console.log('Received payloads:', { name, age });
-    res.json({ name, age });
-  });
+  if (!transactionId || !orderId || !amount || !transactionStatus) {
+    return res.status(400).json({
+      error: `there is a missing request body!`,
+    });
+  }
+
+  if (transactionStatus === 10) {
+    transactionResponse = {
+      transactionId: transactionId,
+      orderId: orderId,
+      amount: amount,
+      transactionStatus: 4,
+    };
+  } else if (transactionStatus === 5) {
+    return res
+      .status(200)
+      .json({ failedDesc: "transction denied out of limit" });
+  } else {
+    return res
+      .status(400)
+      .json({ failedDesc: "status is not settle from kredivo site" });
+  }
+
+  res.status(200).json(transactionResponse);
+});
+
+app.get("/payloadtest", (req, res) => {
+  const { name, age } = req.body;
+
+  if (!name || !age) {
+    return res
+      .status(400)
+      .json({ error: "Name and age are required in the payload." });
+  }
+
+  console.log("Received payloads:", { name, age });
+  res.json({ name, age });
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
