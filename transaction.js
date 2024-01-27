@@ -34,7 +34,7 @@ app.get("/v1/transaction", (req, res) => {
   } else if (transactionStatus === 5) {
     return res
       .status(200)
-      .json({ failedDesc: "transction denied out of limit" });
+      .json({ failedDesc: "transction denied from kredivo side" });
   } else {
     return res
       .status(400)
