@@ -67,6 +67,15 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 
+// your-function.js
+exports.handler = async (event, context) => {
+  // Your function logic here
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ message: "Hello from your Netlify function!" }),
+  };
+};
+
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
