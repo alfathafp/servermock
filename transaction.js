@@ -29,12 +29,9 @@ app.get("/v1/transaction", (req, res) => {
     });
   }
 
-  let transactionTokenGenerated = crypto.randomUUID();
-
   if (transactionStatus === 10) {
     let encryptedText = encrypt(transactionId, orderId, amount, key, iv);
     let decryptedText = decrypt(encryptedText, key, iv);
-    console.log("sini");
     transactionResponse = {
       transactionId: transactionId,
       orderId: orderId,
