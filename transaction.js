@@ -1,21 +1,33 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const crypto = require("crypto");
-const app = express();
-const port = 3000;
+const router = express.Router();
 
 // Middleware to parse JSON bodies
-app.use(bodyParser.json());
+router.use(bodyParser.json());
 
 // Middleware for logging requests
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  next();
+router.use((req, res, next) => {
+  const timestamp = new Date().toISOString();
+  const method = req.method;
+  const url = req.url;
+  const ipAddress = req.ip; // Client's IP address
+  const userAgent = req.get("User-Agent"); // User-Agent header, indicating the client (browser or user agent)
+
+  // Log the request details
+  console.log(
+    `[${timestamp}] ${method} ${url} | IP: ${ipAddress} | User-Agent: ${userAgent}`
+  );
+
+  // Log request payload (if available)
+  if (Object.keys(req.body).length > 0) {
+    console.log("Request Payload:", req.body);
+  }
+
+  next(); // Move on to the next middleware or route handler
 });
 
-// return res.status(errorCode).json({ error: errorMessage });
-
-app.get("/v1/transaction", (req, res) => {
+router.get("/transaction", (req, res) => {
   const { transactionId, orderId, amount, transactionStatus } = req.body;
   let transactionResponse = null;
 
@@ -53,7 +65,7 @@ app.get("/v1/transaction", (req, res) => {
   res.status(200).json(transactionResponse);
 });
 
-app.get("/payloadtest", (req, res) => {
+router.get("/payloadtest", (req, res) => {
   const { name, age } = req.body;
 
   if (!name || !age) {
@@ -78,18 +90,17 @@ function decrypt(encryptedData, key, iv) {
   const parts = decryptedData.split("*");
 
   // Assuming parts are transactionId, orderId, and amount
-  const transactionId = parts[0];
-  const orderId = parts[1];
-  const amountStr = parts[2];
-  console.log(transactionId);
-  console.log(orderId);
-  console.log(amountStr);
+  // const transactionId = parts[0];
+  // const orderId = parts[1];
+  // const amountStr = parts[2];
+  // console.log(transactionId);
+  // console.log(orderId);
+  // console.log(amountStr);
   return decryptedData;
 }
 
 function encrypt(transactionId, orderId, amount, key, iv) {
   const plaintext = transactionId + "*" + orderId + "*" + amount;
-  console.log("plaintext: ", plaintext);
 
   const algorithm = "aes-256-cbc";
 
@@ -107,56 +118,4 @@ function encrypt(transactionId, orderId, amount, key, iv) {
   return encryptedData;
 }
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
-
-// netlify/functions/transaction.js
-
-// const express = require("express");
-// const bodyParser = require("body-parser");
-// const app = express();
-
-// // your-function.js
-// exports.handler = async (event, context) => {
-//   // Your function logic here
-//   return {
-//     statusCode: 200,
-//     body: JSON.stringify({ message: "Hello from your Netlify function!" }),
-//   };
-// };
-
-// // Middleware to parse JSON bodies
-// app.use(bodyParser.json());
-
-// app.post("/v1/transaction", (req, res) => {
-//   const { transactionId, orderId, amount, transactionStatus } = req.body;
-//   let transactionResponse = null;
-
-//   if (!transactionId || !orderId || !amount || !transactionStatus) {
-//     return res.status(400).json({
-//       error: `There is a missing request body!`,
-//     });
-//   }
-
-//   if (transactionStatus === 10) {
-//     transactionResponse = {
-//       transactionId: transactionId,
-//       orderId: orderId,
-//       amount: amount,
-//       transactionStatus: 4,
-//     };
-//   } else if (transactionStatus === 5) {
-//     return res
-//       .status(200)
-//       .json({ failedDesc: "Transaction denied from Kredivo side" });
-//   } else {
-//     return res
-//       .status(400)
-//       .json({ failedDesc: "Status is not settled from Kredivo site" });
-//   }
-
-//   res.status(200).json(transactionResponse);
-// });
-
-// module.exports = app;
+module.exports = router;
