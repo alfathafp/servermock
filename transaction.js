@@ -88,14 +88,6 @@ function decrypt(encryptedData, key, iv) {
   decryptedData += decipher.final("utf-8");
   // Splitting the string using '*'
   const parts = decryptedData.split("*");
-
-  // Assuming parts are transactionId, orderId, and amount
-  // const transactionId = parts[0];
-  // const orderId = parts[1];
-  // const amountStr = parts[2];
-  // console.log(transactionId);
-  // console.log(orderId);
-  // console.log(amountStr);
   return decryptedData;
 }
 
